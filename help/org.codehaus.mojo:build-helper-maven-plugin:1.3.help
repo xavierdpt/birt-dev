@@ -1,0 +1,167 @@
+Name: Build Helper Maven Plugin
+Description: This plugin contains various small independent goals to assist
+  with Maven build lifecycle
+Group Id: org.codehaus.mojo
+Artifact Id: build-helper-maven-plugin
+Version: 1.3
+Goal Prefix: build-helper
+
+This plugin has 10 goals:
+
+build-helper:add-resource
+  Description: Add more resource directories to the POM.
+  Implementation: org.codehaus.mojo.buildhelper.AddResourceMojo
+  Language: java
+  Bound to phase: generate-resources
+
+  Available parameters:
+
+    resources
+      Required: true
+      Additional source directories.
+
+build-helper:add-source
+  Description: Add more source directories to the POM.
+  Implementation: org.codehaus.mojo.buildhelper.AddSourceMojo
+  Language: java
+  Bound to phase: generate-sources
+
+  Available parameters:
+
+    sources
+      Required: true
+      Additional source directories.
+
+build-helper:add-test-resource
+  Description: Add more test resource directories to the POM.
+  Implementation: org.codehaus.mojo.buildhelper.AddTestResourceMojo
+  Language: java
+  Bound to phase: generate-test-resources
+
+  Available parameters:
+
+    resources
+      Required: true
+      Additional source directories.
+
+build-helper:add-test-source
+  Description: Add test source directories to the POM.
+  Implementation: org.codehaus.mojo.buildhelper.AddTestSourceMojo
+  Language: java
+  Bound to phase: generate-test-sources
+
+  Available parameters:
+
+    sources
+      Required: true
+      Additional test source directories.
+
+build-helper:attach-artifact
+  Description: Attach additional artifacts to be installed and deployed.
+  Implementation: org.codehaus.mojo.buildhelper.AttachArtifact
+  Language: java
+  Bound to phase: package
+
+  Available parameters:
+
+    artifacts
+      Required: true
+      Attach an array of artifacts to the project.
+
+build-helper:help
+  Description: Display help information on build-helper-maven-plugin.
+    Call
+     mvn build-helper:help -Ddetail=true -Dgoal=<goal-name>
+    to display parameter details.
+  Implementation: org.codehaus.mojo.buildhelper.HelpMojo
+  Language: java
+
+  Available parameters:
+
+    detail (Default: false)
+      User property: detail
+      If true, display all settable properties for each goal.
+
+    goal
+      User property: goal
+      The name of the goal for which to show help. If unspecified, all goals
+      will be displayed.
+
+    indentSize (Default: 2)
+      User property: indentSize
+      The number of spaces per indentation level, should be positive.
+
+    lineLength (Default: 80)
+      User property: lineLength
+      The maximum length of a display line, should be positive.
+
+build-helper:maven-version
+  Description: Store the maven core version in a property maven.version.
+  Implementation: org.codehaus.mojo.buildhelper.MavenVersionMojo
+  Language: java
+  Bound to phase: validate
+
+  Available parameters:
+
+    versionProperty (Default: maven.version)
+      The name of the property in which to store the version of maven.
+
+build-helper:parse-version
+  Description: Parse a version string and set properties containing the
+    component parts of the version. This mojo sets the following properties:
+    [propertyPrefix].majorVersion
+    [propertyPrefix].minorVersion
+    [propertyPrefix].incrementalVersion
+    [propertyPrefix].qualifier
+    [propertyPrefix].buildNumber
+    Where the propertyPrefix is the string set in the mojo parameter. Note that
+    the behaviour of the parsing is determined by
+    org.apache.maven.artifact.versioning.DefaultArtifactVersion An osgi
+    compatible version will also be created and made available through the
+    property:
+    [propertyPrefix].osgiVersion
+    This version is simply the original version string with the first instance
+    of '-' replaced by '.' For example, 1.0.2-beta-1 will be converted to
+    1.0.2.beta-1
+  Implementation: org.codehaus.mojo.buildhelper.ParseVersionMojo
+  Language: java
+  Bound to phase: validate
+
+  Available parameters:
+
+    propertyPrefix (Default: parsedVersion)
+      Prefix string to use for the set of version properties.
+
+    versionString (Default: ${project.version})
+      The version string to parse.
+
+build-helper:remove-project-artifact
+  Description: Remove project's artifacts from local repository. Useful to
+    keep only one copy of large local snapshot, for example: installer, for
+    disk space optimization purpose.
+  Implementation: org.codehaus.mojo.buildhelper.RemoveLocalArtifactMojo
+  Language: java
+  Bound to phase: package
+
+  Available parameters:
+
+    removeAll (Default: true)
+      When true, remove all built artifacts including all versions. When false,
+      remove all built artifacts of this project version.
+
+build-helper:reserve-network-port
+  Description: Reserve a list of random and not in used network ports and
+    place them in a configurable project properties.
+  Implementation: org.codehaus.mojo.buildhelper.ReserveListenerPortMojo
+  Language: java
+  Bound to phase: process-test-classes
+
+  Available parameters:
+
+    outputFile
+      Output file to write the generated properties to. if not given, they are
+      written to maven project
+
+    portNames
+      Required: true
+      A List to property names to be placed in maven project

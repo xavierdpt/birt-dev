@@ -1,0 +1,417 @@
+Name: Tycho OSGi Packaging Plugin
+Description: A plugin for packaging OSGi bundles
+Group Id: org.eclipse.tycho
+Artifact Id: tycho-packaging-plugin
+Version: 2.3.0
+Goal Prefix: tycho-packaging
+
+This plugin has 11 goals:
+
+tycho-packaging:build-qualifier
+  Description: This mojo generates the build qualifier according to the rules
+    described in the PDE documentation:
+    
+    1.  Explicit -DforceContextQualifier command line parameter
+    2.  forceContextQualifier from ${project.baseDir}/build.properties
+    3.  A time stamp in the form YYYYMMDDHHMM (e.g. 200605121600)
+    
+    
+    
+    The generated qualifier is assigned to buildQualifier project property. The
+    unqualified project version is assigned to unqualifiedVersion project
+    property. The unqualified version is calculated based on ${project.version}
+    and can be used for any Tycho project and regular Maven project. Different
+    projects can use different formats to expand the timestamp (not
+    recommended). The concatenation of ${unqualifiedVersion} and
+    ${buildQualifier}, if not empty, is assigned to the project property
+    qualifiedVersion.
+    
+    The timestamp generation logic is extensible. The primary use case is to
+    generate build version qualifier based on the timestamp of the last project
+    commit. Here is example pom.xml snippet that enables custom timestamp
+    generation logic
+    
+    ...
+    <plugin>
+     <groupId>org.eclipse.tycho</groupId>
+     <artifactId>tycho-packaging-plugin</artifactId>
+     <version>${tycho-version}</version>
+     <dependencies>
+     <dependency>
+     <groupId>timestamp-provider-groupid</groupId>
+     <artifactId>timestamp-provider-artifactid</artifactId>
+     <version>timestamp-provider-version</version>
+     </dependency>
+     </dependencies>
+     <configuration>
+     <timestampProvider>custom</timestampProvider>
+     </configuration>
+    </plugin>
+    ...
+  Implementation: org.eclipse.tycho.buildversion.BuildQualifierMojo
+  Language: java
+  Bound to phase: validate
+
+  Available parameters:
+
+    baseDir
+      User property: project.basedir
+      (no description available)
+      Deprecated. This parameter is deprecated and may be removed in future
+      versions of Tycho.
+
+    forceContextQualifier
+      User property: forceContextQualifier
+      (no description available)
+
+    format (Default: yyyyMMddHHmm)
+      Specify a date format as specified by java.text.SimpleDateFormat.
+      Timezone used is UTC.
+
+    timestampProvider
+      Role hint of a custom build timestamp provider.
+
+tycho-packaging:build-qualifier-aggregator
+  Description: This mojo calculates build timestamp as the latest timestamp
+    of the project itself and timestamps of bundles and features directly
+    included in the project. This is meant to work with custom timestamp
+    providers and generate build qualifier based on build contents, i.e. the
+    source code, and not the time the build was started; rebuilding the same
+    source code will result in the same version qualifier.
+    
+    Timestamp of included bundles and features is determined by parsing their
+    respective version qualifiers. Qualifiers that cannot be parsed are
+    silently ignored, which can result in old version qualifier used even when
+    aggregator project contents actually changed. In this case aggregator
+    project timestamp will have to be increased manually, using artificial SCM
+    commit for example.
+    
+    Qualifier aggregation is enabled only for projects with custom timestamp
+    provider, i.e. <timestampProvider> is set in pom.xml to a value other than
+    'default'. The default build timestamp provider uses build start time as
+    build timestamp, which should be newer or equal than timestamp of any
+    included bundle/feature project, which makes qualifier aggregation
+    redundant.
+  Implementation: org.eclipse.tycho.buildversion.BuildQualifierAggregatorMojo
+  Language: java
+  Bound to phase: validate
+
+  Available parameters:
+
+    baseDir
+      User property: project.basedir
+      (no description available)
+      Deprecated. This parameter is deprecated and may be removed in future
+      versions of Tycho.
+
+    forceContextQualifier
+      User property: forceContextQualifier
+      (no description available)
+
+    format (Default: yyyyMMddHHmm)
+      Specify a date format as specified by java.text.SimpleDateFormat.
+      Timezone used is UTC.
+
+    timestampProvider
+      Role hint of a custom build timestamp provider.
+
+tycho-packaging:package-feature
+  Description: (no description available)
+  Implementation: org.eclipse.tycho.packaging.PackageFeatureMojo
+  Language: java
+  Bound to phase: package
+
+  Available parameters:
+
+    archive
+      The maven archiver to use. One of the archiver properties is the
+      addMavenDescriptor flag, which indicates whether the generated archive
+      will contain the pom.xml and pom.properties file. If no archive
+      configuration is specified, the default value is false. If the maven
+      descriptor should be added to the artifact, use the following
+      configuration:
+      <plugin>
+       <groupId>org.eclipse.tycho</groupId>
+       <artifactId>tycho-packaging-plugin</artifactId>
+       <version>${tycho-version}</version>
+       <configuration>
+       <archive>
+       <addMavenDescriptor>true</addMavenDescriptor>
+       </archive>
+       </configuration>
+      </plugin>
+
+    basedir
+      User property: project.basedir
+      (no description available)
+
+    deployableFeature (Default: false)
+      If set to true, standard eclipse update site directory with feature
+      content will be created under target folder.
+
+    finalName
+      Alias: jarName
+      Required: true
+      User property: project.build.finalName
+      Name of the generated JAR.
+
+    outputDirectory
+      User property: project.build.directory
+      The output directory of the jar file By default this is the Maven target/
+      directory.
+
+    qualifier
+      User property: buildQualifier
+      Build qualifier. Recommended way to set this parameter is using
+      build-qualifier goal.
+
+    strictBinIncludes (Default: true)
+      If set to true (the default), missing build.properties bin.includes will
+      cause build failure. If set to false, missing build.properties
+      bin.includes will be reported as warnings but the build will not fail.
+
+    target (Default: ${project.build.directory}/site)
+      (no description available)
+
+    useDefaultExcludes (Default: true)
+      (no description available)
+
+tycho-packaging:package-iu
+  Description: Creates the zip for the IU and attaches it as an artifact
+  Implementation: org.eclipse.tycho.packaging.PackageIUMojo
+  Language: java
+  Bound to phase: package
+
+  Available parameters:
+
+    artifactContentFolder
+      User property: project.build.outputDirectory
+      Folder containing the files to include in the final zip.
+
+    qualifier
+      User property: buildQualifier
+      Build qualifier. Recommended way to set this parameter is using
+      build-qualifier goal.
+
+    strictBinIncludes (Default: true)
+      If set to true (the default), missing build.properties bin.includes will
+      cause build failure. If set to false, missing build.properties
+      bin.includes will be reported as warnings but the build will not fail.
+
+    useDefaultExcludes (Default: true)
+      (no description available)
+
+tycho-packaging:package-plugin
+  Description: Creates a jar-based plugin and attaches it as an artifact
+  Implementation: org.eclipse.tycho.packaging.PackagePluginMojo
+  Language: java
+
+  Available parameters:
+
+    additionalFileSets
+      Additional files to be included in the bundle jar. This can be used when
+      bin.includes in build.properties is not flexible enough , e.g. for
+      generated files. If conflicting, additional files win over bin.includes
+      Example:
+      
+      <additionalFileSets>
+       <fileSet>
+       <directory>${project.build.directory}/mytool-gen/</directory>
+       <includes>
+       <include>**/*</include>
+       </includes>
+       </fileSet>
+      </additionalFileSets>
+
+    archive
+      The maven archiver to use. One of the archiver properties is the
+      addMavenDescriptor flag, which indicates whether the generated archive
+      will contain the pom.xml and pom.properties file. If no archive
+      configuration is specified, the default value is true. If the maven
+      descriptor should not be added to the artifact, use the following
+      configuration:
+      <plugin>
+       <groupId>org.eclipse.tycho</groupId>
+       <artifactId>tycho-packaging-plugin</artifactId>
+       <version>${tycho-version}</version>
+       <configuration>
+       <archive>
+       <addMavenDescriptor>false</addMavenDescriptor>
+       </archive>
+       </configuration>
+      </plugin>
+
+    buildDirectory
+      Required: true
+      User property: project.build.directory
+      The output directory of the jar file By default this is the Maven
+      'target/' directory.
+
+    finalName
+      Alias: jarName
+      Required: true
+      User property: project.build.finalName
+      Name of the generated JAR.
+
+    qualifier
+      User property: buildQualifier
+      Build qualifier. Recommended way to set this parameter is using
+      build-qualifier goal.
+
+    sourceReferences
+      Whether to generate an Eclipse-SourceReferences MANIFEST header. When
+      using this parameter, property ${tycho.scmUrl} must be set and be a valid
+      maven SCM URL. Example configuration:
+       <sourceReferences>
+       <generate>true</generate>
+       </sourceReferences>
+      Note that a SourceReferencesProvider component must be registered for the
+      SCM type being used. You may also override the generated value by
+      configuring:
+       <sourceReferences>
+       <generate>true</generate>
+       <customValue>scm:myscm:customSourceReferenceValue</customValue>
+       </sourceReferences>
+
+    strictBinIncludes (Default: true)
+      If set to true (the default), missing build.properties bin.includes will
+      cause build failure. If set to false, missing build.properties
+      bin.includes will be reported as warnings but the build will not fail.
+
+    useDefaultExcludes (Default: true)
+      (no description available)
+
+tycho-packaging:package-target-definition
+  Description: Registers all target definition files in the basedir of a
+    project as maven artifact.
+  Implementation: org.eclipse.tycho.packaging.PackageTargetDefinitionMojo
+  Language: java
+  Bound to phase: package
+
+  Available parameters:
+
+tycho-packaging:product-export
+  Description: (no description available)
+  Implementation: org.eclipse.tycho.packaging.ProductExportMojo
+  Language: java
+
+  Available parameters:
+
+    createProductArchive (Default: true)
+      User property: tycho.product.createArchive
+      (no description available)
+
+    environments
+      (no description available)
+      Deprecated. use target-platform-configuration <environments/> element
+
+    expandedProductFile (Default:
+    ${project.build.directory}/${project.artifactId}.product)
+      Location of generated .product file with all versions replaced with their
+      expanded values.
+
+    forcePackedDependencies (Default: false)
+Unknown
+
+    includeSources (Default: false)
+      (no description available)
+
+    p2inf (Default: ${productConfiguration}/../p2.inf)
+      (no description available)
+
+    productConfigurationFile (Default:
+    ${project.basedir}/${project.artifactId}.product)
+      User property: productConfiguration
+      The product configuration, a .product file. This file manages all aspects
+      of a product definition from its constituent plug-ins to configuration
+      files to branding.
+
+    qualifier
+      User property: buildQualifier
+      Build qualifier. Recommended way to set this parameter is using
+      build-qualifier goal.
+
+    separateEnvironments (Default: true)
+      If true (the default), produce separate directory structure for each
+      supported runtime environment.
+
+    strictBinIncludes (Default: true)
+      If set to true (the default), missing build.properties bin.includes will
+      cause build failure. If set to false, missing build.properties
+      bin.includes will be reported as warnings but the build will not fail.
+
+    useDefaultExcludes (Default: true)
+      (no description available)
+
+tycho-packaging:update-site
+  Description: (no description available)
+  Implementation: org.eclipse.tycho.packaging.UpdateSiteMojo
+  Language: java
+
+  Available parameters:
+
+    basedir
+      User property: project.basedir
+      (no description available)
+
+    inlineArchives
+      (no description available)
+
+    qualifier
+      User property: buildQualifier
+      Build qualifier. Recommended way to set this parameter is using
+      build-qualifier goal.
+
+    strictBinIncludes (Default: true)
+      If set to true (the default), missing build.properties bin.includes will
+      cause build failure. If set to false, missing build.properties
+      bin.includes will be reported as warnings but the build will not fail.
+
+    target (Default: ${project.build.directory}/site)
+      (no description available)
+
+    useDefaultExcludes (Default: true)
+      (no description available)
+
+tycho-packaging:update-site-packaging
+  Description: (no description available)
+  Implementation: org.eclipse.tycho.packaging.PackageUpdateSiteMojo
+  Language: java
+
+  Available parameters:
+
+    archiveSite (Default: false)
+      If true, create site assembly zip file. If false (the default), do not
+      create site assembly zip file. Please note that the project's main
+      artifact that will be deployed/installed to maven repository is a zip
+      only containing the site.xml. However, if this parameter is set to true
+      an additional result file classified as 'assembly' containing a full
+      packaged update site will be created and installed.
+
+    target (Default: ${project.build.directory}/site)
+      Generated update site location (must match update-site mojo
+      configuration)
+
+tycho-packaging:validate-id
+  Description: Validates that project Maven and OSGi ids match.
+  Implementation: org.eclipse.tycho.buildversion.ValidateIdMojo
+  Language: java
+  Bound to phase: validate
+
+  Available parameters:
+
+tycho-packaging:validate-version
+  Description: Validates project Maven and OSGi versions. For SNAPSHOT
+    versions, OSGi version qualifier must be '.qualifier' and unqualified Maven
+    and OSGi versions must be equal. For RELEASE versions, OSGi and Maven
+    versions must be equal.
+  Implementation: org.eclipse.tycho.buildversion.ValidateVersionMojo
+  Language: java
+  Bound to phase: validate
+
+  Available parameters:
+
+    strictVersions (Default: true)
+      If true (the default) will fail the build if Maven and OSGi project
+      versions do not match. If false will issue a warning but will not fail
+      the build if Maven and OSGi project versions do not match.

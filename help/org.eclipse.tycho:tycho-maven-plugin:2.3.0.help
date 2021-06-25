@@ -1,0 +1,9 @@
+Name: Tycho Maven Build Extension
+Description: The Tycho Maven Plugin provides extensions to build Eclipse
+  projects.
+Group Id: org.eclipse.tycho
+Artifact Id: tycho-maven-plugin
+Version: 2.3.0
+Goal Prefix: tycho
+
+This plugin has 0 goal:

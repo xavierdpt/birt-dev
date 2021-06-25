@@ -1,0 +1,75 @@
+Name: Tycho p2 Publisher Plugin
+Description: Tycho integrates Maven with Eclipse and OSGi
+Group Id: org.eclipse.tycho
+Artifact Id: tycho-p2-publisher-plugin
+Version: 2.3.0
+Goal Prefix: tycho-p2-publisher
+
+This plugin has 5 goals:
+
+tycho-p2-publisher:attach-artifacts
+  Description: Attaches p2 metadata and extra artifacts produced by the
+    publishers to the project. In this way, the full build results are
+    available in the local Maven repository, e.g. for builds of parts of a
+    reactor.
+  Implementation:
+  org.eclipse.tycho.plugins.p2.publisher.persistence.AttachPublishedArtifactsMojo
+  Language: java
+
+  Available parameters:
+
+tycho-p2-publisher:publish-categories
+  Description: Publishes the category definitions from the category.xml in
+    the root of the project.
+  Implementation: org.eclipse.tycho.plugins.p2.publisher.PublishCategoriesMojo
+  Language: java
+  Bound to phase: package
+
+  Available parameters:
+
+tycho-p2-publisher:publish-ee-profile
+  Description: Publishes a custom execution environment profile.
+  Implementation: org.eclipse.tycho.plugins.p2.publisher.PublishEEProfileMojo
+  Language: java
+  Bound to phase: prepare-package
+
+  Available parameters:
+
+    profileFile
+      Required: true
+      The profile file containing the execution environment definition.
+
+tycho-p2-publisher:publish-osgi-ee
+  Description: Publishes OSGi execution environment profiles into a p2
+    repository. The published IUs satisfy dependencies to corresponding osgi.ee
+    capabilities and system packages.
+  Implementation: org.eclipse.tycho.plugins.p2.publisher.PublishOsgiEEMojo
+  Language: java
+  Bound to phase: prepare-package
+
+  Available parameters:
+
+    profiles (Default: JavaSE-11, JavaSE-15, JavaSE-16)
+      Comma-separated list of profile names to be published. Examples:
+      JavaSE-11, JavaSE-15, JavaSE-16. It is advised to keep this list as small
+      as possible and the list must include the BREE used by the platform, last
+      Java LTS and the latest Java release.
+
+    skip (Default: false)
+      (no description available)
+
+tycho-p2-publisher:publish-products
+  Description: Publishes all product definitions files (*.product) that are
+    present in the root of the project.
+  Implementation: org.eclipse.tycho.plugins.p2.publisher.PublishProductMojo
+  Language: java
+  Bound to phase: package
+
+  Available parameters:
+
+    flavor (Default: tooling)
+      The name of the p2 installation flavor to create. De facto, this
+      parameter is set to 'tooling' in all uses of p2.
+      Deprecated. This parameter has no useful effect and may be removed in a
+      future version of
+       Tycho.

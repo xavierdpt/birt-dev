@@ -1,0 +1,113 @@
+Name: Jetty :: Jetty JSPC Maven Plugin
+Description: The Eclipse Jetty Project
+Group Id: org.eclipse.jetty
+Artifact Id: jetty-jspc-maven-plugin
+Version: 9.4.39.v20210325
+Goal Prefix: jetty-jspc
+
+This plugin has 2 goals:
+
+jetty-jspc:help
+  Description: Display help information on jetty-jspc-maven-plugin.
+    Call mvn jetty-jspc:help -Ddetail=true -Dgoal=<goal-name> to display
+    parameter details.
+  Implementation: org.eclipse.jetty.jspc.plugin.HelpMojo
+  Language: java
+
+  Available parameters:
+
+    detail (Default: false)
+      User property: detail
+      If true, display all settable properties for each goal.
+
+    goal
+      User property: goal
+      The name of the goal for which to show help. If unspecified, all goals
+      will be displayed.
+
+    indentSize (Default: 2)
+      User property: indentSize
+      The number of spaces per indentation level, should be positive.
+
+    lineLength (Default: 80)
+      User property: lineLength
+      The maximum length of a display line, should be positive.
+
+jetty-jspc:jspc
+  Description: This goal will compile jsps for a webapp so that they can be
+    included in a war.
+    At runtime, the plugin will use the jspc compiler to precompile jsps and
+    tags.
+    
+    Note that the same java compiler will be used as for on-the-fly compiled
+    jsps, which will be the Eclipse java compiler.
+    
+    See Usage Guide for instructions on using this plugin.
+    Runs jspc compiler to produce .java and .class files
+  Implementation: org.eclipse.jetty.jspc.plugin.JspcMojo
+  Language: java
+  Bound to phase: process-classes
+
+  Available parameters:
+
+    classesDirectory (Default: ${project.build.outputDirectory})
+      The location of the compiled classes for the webapp
+
+    excludes (Default: **\/.svn\/**)
+      The comma separated list of file name patters to exclude from
+      compilation.
+
+    generatedClasses (Default: ${project.build.outputDirectory})
+      The destination directory into which to put the compiled jsps.
+
+    includes (Default: **\/*.jsp, **\/*.jspx)
+      The comma separated list of patterns for file extensions to be processed.
+      By default will include all .jsp and .jspx files.
+
+    insertionMarker
+      Optional. A marker string in the src web.xml file which indicates where
+      to merge in the generated web.xml fragment. Note that the marker string
+      will NOT be preserved during the insertion. Can be left blank, in which
+      case the generated fragment is inserted just before the </web-app> line
+
+    jspc
+      The JspC instance being used to compile the jsps.
+
+    keepSources (Default: false)
+      Controls whether or not .java files generated during compilation will be
+      preserved.
+
+    mergeFragment (Default: true)
+      Merge the generated fragment file with the web.xml from
+      webAppSourceDirectory. The merged file will go into the same directory as
+      the webXmlFragment.
+
+    scanAllDirectories (Default: true)
+      Whether dirs on the classpath should be scanned as well as jars. True by
+      default. This allows for scanning for tlds of dependent projects that are
+      in the reactor as unassembled jars.
+
+    sourceVersion
+      Source version - if not set defaults to jsp default (currently 1.7)
+
+    targetVersion
+      Target version - if not set defaults to jsp default (currently 1.7)
+
+    tldJarNamePatterns (Default: .*taglibs[^/]*\.jar|.*jstl[^/]*\.jar$)
+      Patterns of jars on the system path that contain tlds. Use | to separate
+      each pattern.
+
+    useProvidedScope (Default: false)
+      Whether or not to include dependencies on the plugin's classpath with
+      <scope>provided</scope> Use WITH CAUTION as you may wind up with
+      duplicate jars/classes.
+
+    webAppSourceDirectory (Default: ${basedir}/src/main/webapp)
+      Root directory for all html/jsp etc files
+
+    webXml (Default: ${basedir}/src/main/webapp/WEB-INF/web.xml)
+      Location of web.xml. Defaults to src/main/webapp/web.xml.
+
+    webXmlFragment (Default: ${basedir}/target/webfrag.xml)
+      File into which to generate the <servlet> and <servlet-mapping> tags for
+      the compiled jsps

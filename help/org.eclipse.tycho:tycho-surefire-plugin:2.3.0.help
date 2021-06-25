@@ -1,0 +1,369 @@
+Name: Tycho Surefire Plugin
+Description: Tycho integrates Maven with Eclipse and OSGi
+Group Id: org.eclipse.tycho
+Artifact Id: tycho-surefire-plugin
+Version: 2.3.0
+Goal Prefix: tycho-surefire
+
+This plugin has 1 goal:
+
+tycho-surefire:test
+  Description: Executes tests in an OSGi runtime.
+    
+    The goal launches an OSGi runtime and executes the project's tests in that
+    runtime. The 'test runtime' consists of the bundle built in this project
+    and its transitive dependencies, plus some Equinox and test harness
+    bundles. The bundles are resolved from the target platform of the project.
+    Note that the test runtime does typically not contain the entire target
+    platform. If there are implicitly required bundles (e.g.
+    org.apache.felix.scr to make declarative services work), they need to be
+    added manually through an extraRequirements configuration on the
+    target-platform-configuration plugin.
+  Implementation: org.eclipse.tycho.surefire.TestMojo
+  Language: java
+  Bound to phase: integration-test
+
+  Available parameters:
+
+    appArgLine
+      Arbitrary applications arguments to set on the command line.
+
+    application
+      Eclipse application to be run. If not specified, default application
+      org.eclipse.ui.ide.workbench will be used. Application runnable will be
+      invoked from test harness, not directly from Eclipse. Note that you need
+      to ensure that the bundle which defines the configured application is
+      included in the test runtime.
+
+    argLine
+      User property: tycho.testArgLine
+      Arbitrary JVM options to set on the command line.
+
+    bundleStartLevel
+      Bundle start level and auto start configuration used by the test runtime.
+      Ignored if testRuntime is p2Installed. Example:
+      <bundleStartLevel>
+       <bundle>
+       <id>foo.bar.myplugin</id>
+       <level>6</level>
+       <autoStart>true</autoStart>
+       </bundle>
+      </bundleStartLevel>
+
+    debugPort
+      User property: debugPort
+      Set this parameter to suspend the test JVM waiting for a client to open a
+      remote debug session on the specified port.
+
+    defaultStartLevel
+      The default bundle start level and auto start configuration used by the
+      test runtime for bundles where the start level/auto start is not
+      configured in bundleStartLevel. Ignored if testRuntime is p2Installed.
+      Example:
+       <defaultStartLevel>
+       <level>6</level>
+       <autoStart>true</autoStart>
+       </defaultStartLevel>
+
+    deleteOsgiDataDirectory (Default: true)
+      Whether to recursively delete the directory osgiDataDirectory before
+      running the tests.
+
+    dependencies
+      Additional dependencies to be added to the test runtime. Ignored if
+      testRuntime is p2Installed. Note: This parameter has only limited support
+      for dependencies to artifacts within the reactor. Therefore it is
+      recommended to specify extraRequirements on the
+      target-platform-configuration plugin instead. Example:
+      <plugin>
+       <groupId>org.eclipse.tycho</groupId>
+       <artifactId>target-platform-configuration</artifactId>
+       <version>${tycho-version}</version>
+       <configuration>
+       <dependency-resolution>
+       <extraRequirements>
+       <requirement>
+       <type>eclipse-feature</type>
+       <id>example.project.feature</id>
+       <versionRange>0.0.0</versionRange>
+       </requirement>
+       </extraRequirements>
+       </dependency-resolution>
+       </configuration>
+      </plugin>
+      The dependencies specified as extraRequirements are - together with the
+      dependencies specified in the MANIFEST.MF of the project - transitively
+      resolved against the target platform. The resulting set of bundles is
+      included in the test runtime.
+
+    enableAssertions (Default: false)
+      User property: enableAssertions
+      By default, Tycho Surefire disables JVM assertions for the execution of
+      your test cases. To enable the assertions, set this flag to 'true'.
+
+    environmentVariables
+      Additional environments to set for the forked test JVM.
+
+    excludedGroups
+      User property: excludedGroups
+      (junit47 provider with JUnit4.8+ only) Excluded groups/categories
+      (comma-separated). Any methods/classes/etc with one of the
+      groups/categories specified in this list will specifically not be run.
+      For JUnit, this parameter forces the use of the junit47 provider
+
+    excludes
+      List of patterns (separated by commas) used to specify the tests that
+      should be excluded in testing. When not specified and when the test
+      parameter is not specified, the default excludes will be **/*$* (which
+      excludes all inner classes).
+
+    explodedBundles
+      List of bundles that must be expanded in order to execute the tests.
+      Ignored if testRuntime is p2Installed.
+
+    failIfNoTests (Default: true)
+      User property: failIfNoTests
+      If set to 'false' the test execution will not fail in case there are no
+      tests found.
+
+    forkedProcessTimeoutInSeconds
+      User property: surefire.timeout
+      Kill the forked test process after a certain number of seconds. If set to
+      0, wait forever for the process, never timing out.
+
+    frameworkExtensions
+      List of framework extension bundles to add. Note: The goal does not
+      automatically detect which bundles in the test runtime are framework
+      extensions, but they have to be explicitly specified using this
+      parameter. Ignored if testRuntime is p2Installed.
+
+    groups
+      User property: groups
+      (junit47 provider with JUnit4.8+ only) Groups/categories for this test
+      (comma-separated). Only classes/methods/etc decorated with one of the
+      group/category specified here will be included in test run, if specified.
+      For JUnit, this parameter forces the use of the junit47 provider
+
+    includes
+      List of patterns (separated by commas) used to specify the tests that
+      should be included in testing. When not specified and when the test
+      parameter is not specified, the default includes will be **/Test*.java
+      **/*Test.java **/*Tests.java **/*TestCase.java
+
+    osgiDataDirectory (Default: ${project.build.directory}/work/data/)
+      OSGi data directory (osgi.instance.area, aka the workspace) of the
+      Equinox runtime used to execute tests.
+
+    parallel
+      User property: parallel
+      (JUnit 4.7 provider) Supports values 'classes'/'methods'/'both' to run in
+      separate threads, as controlled by threadCount.
+
+    perCoreThreadCount (Default: true)
+      User property: perCoreThreadCount
+      (JUnit 4.7 provider) Indicates that threadCount is per cpu core.
+
+    pluginArtifacts
+      User property: plugin.artifacts
+      (no description available)
+
+    product
+      Eclipse product to be run, i.e. -product parameter passed to test Eclipse
+      runtime.
+
+    profileName (Default: DefaultProfile)
+      p2 profile name of the installation under test. Only relevant if
+      testRuntime is p2Installed. If tests are installed on top of an already
+      existing installation in work, this must match the name of the existing
+      profile.
+
+    providerHint
+      Normally tycho will automatically determine the test framework provider
+      based on the test project's classpath. Use this to force using a test
+      framework provider implementation with the given role hint. Tycho comes
+      with providers 'junit3','junit4','junit47','junit5'. Note that when
+      specifying a providerHint, you have to make sure the provider is actually
+      available in the dependencies of tycho-surefire-plugin.
+
+    providerProperties
+      Use this to specify surefire provider-specific properties.
+
+    redirectTestOutputToFile (Default: false)
+      User property: maven.test.redirectTestOutputToFile
+      Set this to 'true' to redirect the unit test standard output to a file
+      (found in reportsDirectory/testName-output.txt).
+
+    reportsDirectory (Default: ${project.build.directory}/surefire-reports)
+      Base directory where all reports are written to.
+
+    rerunFailingTestsCount (Default: 0)
+      User property: surefire.rerunFailingTestsCount
+      Flaky tests will re-run until they pass or the number of reruns has been
+      exhausted. See surefire documentation for details.
+      Note: This feature is supported only for JUnit 4.x
+
+    runOrder (Default: filesystem)
+      Defines the order the tests will be run in. Supported values are
+      'alphabetical', 'reversealphabetical', 'random', 'hourly' (alphabetical
+      on even hours, reverse alphabetical on odd hours) and 'filesystem'.
+
+    showEclipseLog (Default: false)
+      User property: tycho.showEclipseLog
+      Enables -debug -consolelog for the test OSGi runtime
+
+    skip
+      User property: maven.test.skip
+      Same as skipTests
+
+    skipAfterFailureCount (Default: 0)
+      User property: surefire.skipAfterFailureCount
+      Skips the remaining tests after the Nth failure or error. See surefire
+      documentation for details.
+
+    skipExec
+      User property: maven.test.skipExec
+      (no description available)
+      Deprecated. Use skipTests instead.
+
+    skipTests
+      User property: skipTests
+      Set this to 'true' to skip running tests, but still compile them. Its use
+      is NOT RECOMMENDED, but quite convenient on occasion. Default: false
+
+    suiteXmlFiles
+      Only supported by the TestNG test provider. The values specified are
+      passed to TestNG as test suite files. The suite files will overwrite the
+      includes and excludes patterns. The path to the suite file(s) could be
+      relative (test bundle classpath) or an absolute path to xml files outside
+      the test bundle.
+      <configuration>
+       <suiteXmlFiles>
+       <suiteXmlFile>myTestSuite.xml</suiteXmlFile>
+       </suiteXmlFiles>
+      </configuration>
+
+    surefireProperties (Default:
+    ${project.build.directory}/surefire.properties)
+      (no description available)
+
+    systemProperties
+      Additional system properties to set for the forked test JVM.
+
+    test
+      User property: test
+      Specify this parameter if you want to use the test pattern matching
+      notation, Ant pattern matching, to select tests to run. The Ant pattern
+      will be used to create an include pattern formatted like **/${test}.java
+      When used, the includes and excludes patterns parameters are ignored
+
+    testClass
+      User property: testClass
+      Identifies a single test (suite) class to run. This is useful if you have
+      a single JUnit test suite class defining which tests should be executed.
+      Will be ignored if test is specified. Example:
+      <testClass>foo.bar.FooTest</testClass>
+
+    testClassesDirectory
+      User property: project.build.outputDirectory
+      The directory containing generated test classes of the project being
+      tested.
+
+    testFailureIgnore (Default: false)
+      User property: maven.test.failure.ignore
+      Set this to true to ignore a failure during testing. Its use is NOT
+      RECOMMENDED, but quite convenient on occasion.
+
+    testRuntime (Default: default)
+      How to create the OSGi test runtime. Allowed values are default and
+      p2Installed. Mode p2Installed is EXPERIMENTAL - only works when
+      installing products under test (see below).
+      - In default mode, all necessary files to define the test runtime like
+        config.ini are generated by tycho. This installation mode has the
+        advantage that the test runtime is minimal (defined by the transitive
+        dependencies of the test bundle plus and the test harness) and existing
+        bundle jars are referenced rather than copied for the installation
+      - In p2Installed mode, use p2 director to install test bundle, test
+        harness bundles and respective dependencies. This installation mode can
+        be used for integration tests that require a fully p2-provisioned
+        installation. To install a product IU, add it as extra requirement to
+        the test bundle (see example below). Note that this installation mode
+        comes with a certain performance overhead for executing the
+        provisioning operations otherwise not required.
+      Example configuration which will install product IU under test
+      'example.product.id' using p2:
+      <plugin>
+       <groupId>org.eclipse.tycho</groupId>
+       <artifactId>tycho-surefire-plugin</artifactId>
+       <version>${tycho-version}</version>
+       <configuration>
+       <testRuntime>p2Installed</testRuntime>
+       </configuration>
+      </plugin>
+      <plugin>
+       <groupId>org.eclipse.tycho</groupId>
+       <artifactId>target-platform-configuration</artifactId>
+       <version>${tycho-version}</version>
+       <configuration>
+       <dependency-resolution>
+       <extraRequirements>
+       <!-- product IU under test -->
+       <requirement>
+       <type>p2-installable-unit</type>
+       <id>example.product.id</id>
+       <versionRange>0.0.0</versionRange>
+       </requirement>
+       </extraRequirements>
+       </dependency-resolution>
+       </configuration>
+      </plugin>
+
+    threadCount
+      User property: threadCount
+      (JUnit 4.7 provider) The attribute thread-count allows you to specify how
+      many threads should be allocated for this execution. Only makes sense to
+      use in conjunction with the parallel parameter.
+
+    trimStackTrace (Default: true)
+      User property: trimStackTrace
+      When true, stack traces are trimmed to only show lines within the test.
+
+    useJDK (Default: SYSTEM)
+      Which JDK to use for executing tests. Possible values are: SYSTEM, BREE .
+      - SYSTEM: Use the currently running JVM (or from toolchain if configured
+        in pom.xml)
+      - BREE: use MANIFEST header Bundle-RequiredExecutionEnvironment to lookup
+        the JDK from toolchains.xml. The value of BREE will be matched against
+        the id of the toolchain elements in toolchains.xml.
+      Example for BREE:
+      In META-INF/MANIFEST.MF:
+      Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+      In toolchains.xml:
+      <toolchains>
+       <toolchain>
+       <type>jdk</type>
+       <provides>
+       <id>JavaSE-1.7</id>
+       </provides>
+       <configuration>
+       <jdkHome>/path/to/jdk/1.7</jdkHome>
+       </configuration>
+       </toolchain>
+      </toolchains>
+
+    useUIHarness (Default: false)
+      Run tests using UI (true) or headless (false) test harness.
+
+    useUIThread (Default: true)
+      Run tests in UI (true) or background (false) thread. Only applies to UI
+      test harness.
+
+    useUnlimitedThreads (Default: false)
+      User property: useUnlimitedThreads
+      (JUnit 4.7 provider) Indicates that the thread pool will be unlimited.
+      The parallel parameter and the actual number of classes/methods will
+      decide. Setting this to 'true' effectively disables perCoreThreadCount
+      and threadCount.
+
+    work (Default: ${project.build.directory}/work)
+      Root directory (osgi.install.area) of the Equinox runtime used to execute
+      tests.

@@ -1,0 +1,136 @@
+Name: Tycho p2 Repository Plugin
+Description: A plugin for creating p2 repositories
+Group Id: org.eclipse.tycho
+Artifact Id: tycho-p2-repository-plugin
+Version: 2.3.0
+Goal Prefix: tycho-p2-repository
+
+This plugin has 5 goals:
+
+tycho-p2-repository:archive-repository
+  Description: Creates a zip archive with the aggregated p2 repository.
+  Implementation: org.eclipse.tycho.plugins.p2.repository.ArchiveRepositoryMojo
+  Language: java
+  Bound to phase: package
+
+  Available parameters:
+
+    finalName
+      User property: project.build.finalName
+      Name of the generated zip file (without extension).
+
+    repositoryLocation
+      (no description available)
+
+    skipArchive (Default: false)
+      Whether or not to skip archiving the repository. False by default.
+
+tycho-p2-repository:assemble-repository
+  Description: Aggregates content into a p2 repository in
+    ${project.build.directory}/repository.
+    
+    1.  Copies resources (if any) from ${project.build.outputDirectory} to
+      ${project.build.directory}/repository. This allows to include additional
+      files such as index.html or about files from src/main/resources (or
+      elsewhere) into the p2 repository.
+    2.  The p2 aggregation into ${project.build.directory}/repository runs
+      recursively: it starts with the content published in the current module,
+      and traverses all artifacts that are marked as included in already
+      aggregated artifacts. (The following artifacts can include other
+      artifacts: categories, products, and features. Note: Dependencies with a
+      strict version range, i.e. a range which only matches exactly one version
+      of an artifact, are also considered as inclusions.)
+  Implementation:
+  org.eclipse.tycho.plugins.p2.repository.AssembleRepositoryMojo
+  Language: java
+  Bound to phase: package
+
+  Available parameters:
+
+    compress (Default: true)
+      Compress the repository index files content.xml and artifacts.xml.
+
+    createArtifactRepository (Default: true)
+      By default, this goal creates a p2 repository. Set this to false if only
+      a p2 metadata repository (without the artifact files) shall be created.
+
+    extraArtifactRepositoryProperties
+      (no description available)
+
+    includeAllDependencies (Default: false)
+      By default, only (transitive) inclusions of the published artifacts are
+      aggregated. Set this parameter to true to aggregate all transitive
+      dependencies, making the resulting p2 repository self-contained.
+
+    keepNonXzIndexFiles (Default: true)
+      If xzCompress is true, whether jar or xml index files should be kept in
+      addition to XZ-compressed index files. This fallback provides backwards
+      compatibility for pre-Mars p2 clients which cannot read XZ-compressed
+      index files.
+
+    profileProperties
+      Additional properties against which p2 filters are evaluated while
+      aggregating.
+
+    repositoryLocation
+      (no description available)
+
+    repositoryName (Default: ${project.name})
+      The name attribute stored in the created p2 repository.
+
+    xzCompress (Default: true)
+      Add XZ-compressed repository index files. XZ offers better compression
+      ratios esp. for highly redundant file content.
+
+tycho-p2-repository:fix-artifacts-metadata
+  Description: Updates the artifact repository metadata checksums and size of
+    modified artifacts in the given folder.
+    This can be used if some other mojo (e.g. jar-signer) modifies the
+    repository artifacts after the assemble-repository step. An example could
+    be found in the jar-signing-extra integration test
+  Implementation:
+  org.eclipse.tycho.plugins.p2.repository.FixArtifactsMetadataMetadataMojo
+  Language: java
+  Bound to phase: prepare-package
+
+  Available parameters:
+
+    keepNonXzIndexFiles (Default: true)
+      If xzCompress is true, whether jar or xml index files should be kept in
+      addition to XZ-compressed index files. This fallback provides backwards
+      compatibility for pre-Mars p2 clients which cannot read XZ-compressed
+      index files.
+
+    repositoryLocation
+      (no description available)
+
+    repositoryName (Default: ${project.name})
+      (no description available)
+
+    xzCompress (Default: true)
+      Add XZ-compressed repository index files. XZ offers better compression
+      ratios esp. for highly redundant file content.
+
+tycho-p2-repository:remap-artifacts-to-m2-repo
+  Description: Modify the artifact metadata of the provided p2 repository by
+    adding extra mapping rules for artifacts the can be resolved to Maven
+    repositories so the URL under Maven repository is used for fetching and
+    artifact is not duplicated inside this repo.
+  Implementation:
+  org.eclipse.tycho.plugins.p2.repository.RemapArtifactToMavenRepositoriesMojo
+  Language: java
+  Bound to phase: prepare-package
+
+  Available parameters:
+
+    repositoryLocation
+      (no description available)
+
+tycho-p2-repository:verify-repository
+  Description: Checks the consistency of the aggregated p2 repository.
+  Implementation:
+  org.eclipse.tycho.plugins.p2.repository.VerifyIntegrityRepositoryMojo
+  Language: java
+  Bound to phase: verify
+
+  Available parameters:

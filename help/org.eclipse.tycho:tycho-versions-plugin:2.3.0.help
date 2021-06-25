@@ -1,0 +1,82 @@
+Name: Tycho Versions Plugin
+Description: Tycho integrates Maven with Eclipse and OSGi
+Group Id: org.eclipse.tycho
+Artifact Id: tycho-versions-plugin
+Version: 2.3.0
+Goal Prefix: tycho-versions
+
+This plugin has 3 goals:
+
+tycho-versions:set-version
+  Description: Sets the version of the current project and child projects
+    with the same version, and updates references as necessary.
+    
+    The set-version goal implements a version refactoring for a Tycho reactor:
+    When updating the version of a project, it consistently updates the version
+    strings in the project's configuration files (e.g. pom.xml and
+    META-INF/MANIFEST.MF) and all references to that project (e.g. in a
+    feature.xml).
+    
+    In many cases, the set-version goal changes the version of multiple
+    projects or entities at once. In addition to the current project, child
+    projects with the same version are also changed. The set of version changes
+    is determined according to the following rules:
+    
+    - When the parent project of a project is changed and the project has the
+      same version as the parent project, the project is also changed.
+    - When an eclipse-plugin project is changed and the plugin exports a
+      package with a version which is the same as the unqualified project
+      version, the version of the package is also changed.
+    - Require-Bundle and Fragment-Host Version Range in references to an
+      eclipse-plugin that changed version will be updated:
+      - if the newVersion becomes out of the original VersionRange
+      - or if updateVersionRangeMatchingBounds is true and one of the bounds is
+        matching the original version
+    - When an eclipse-repository project is changed and a product file in the
+      project has an equivalent version, the version in the product file is
+      also changed.
+  Implementation: org.eclipse.tycho.versions.SetMojo
+  Language: java
+
+  Available parameters:
+
+    artifacts (Default: ${project.artifactId})
+      User property: artifacts
+      Initial list of of projects to be changed. From these projects, the full
+      list of projects to be changed is derived according to the rules
+      described above. If set, this parameter needs to be specified as a comma
+      separated list of artifactIds.
+
+    newVersion
+      Alias: developmentVersion
+      Required: true
+      User property: newVersion
+      The new version to set to the current project and other entities which
+      have the same version as the current project.
+
+    properties
+      User property: properties
+      Comma separated list of names of POM properties to set the new version
+      to. Note that properties are only changed in the projects explicitly
+      listed by the artifacts parameter.
+
+    updateVersionRangeMatchingBounds (Default: false)
+      User property: updateVersionRangeMatchingBounds
+      When true bounds of OSGI version ranges referencing the version of an
+      element that changed version will be updated to match the newVersion.
+
+tycho-versions:update-eclipse-metadata
+  Description: Update Eclipse/OSGi metadata (MANIFEST.MF, feature.xml,
+    product.xml) version to match corresponding pom.xml.
+  Implementation: org.eclipse.tycho.versions.UpdateEclipseMetadataMojo
+  Language: java
+
+  Available parameters:
+
+tycho-versions:update-pom
+  Description: Update pom.xml version to match corresponding Eclipse/OSGi
+    metadata.
+  Implementation: org.eclipse.tycho.versions.UpdatePomMojo
+  Language: java
+
+  Available parameters:

@@ -1,0 +1,83 @@
+Name: Tycho Source Feature Generation Plugin
+Description: Additional tools for Tycho
+Group Id: org.eclipse.tycho.extras
+Artifact Id: tycho-source-feature-plugin
+Version: 2.3.0
+Goal Prefix: tycho-source-feature
+
+This plugin has 1 goal:
+
+tycho-source-feature:source-feature
+  Description: Generates a source feature for projects of packaging type
+    eclipse-feature. By default, the generated source feature
+    - Declares feature id <originalFeatureId>.source
+    - Declares feature label '<originalFeatureLabel> Developer Resources'
+    - If present, reuses feature provider, description, copyright and license
+      as well as respective URLs from <originalFeature>
+    - Includes all plugins included by <originalFeature>, but each with .source
+      appended to each plugin id
+    - Includes all features included by <originalFeature>, but each with
+      .source appended to each feature id
+    - Includes the original feature. This ensures that binaries and
+      corresponding sources match.
+    Source feature generation can be customized by adding files under path
+    sourceTemplateFeature/. Files added here will be added to the root of the
+    source feature jar. Especially, if file
+    sourceTemplateFeature/feature.properties is found, values in this file
+    override values of respective keys in <originalFeature>/feature.properties.
+  Deprecated. this mojo is replaced by the tycho-source-plugin with execution
+  feature-source which
+   offers equivalent and even enhanced functionality
+  Implementation: org.eclipse.tycho.extras.sourcefeature.SourceFeatureMojo
+  Language: java
+  Bound to phase: package
+
+  Available parameters:
+
+    archive
+      (no description available)
+
+    brandingPlugin
+      Use this to explicitly set the branding plugin attribute of the generated
+      source feature (overrides reuseBrandingPlugin).
+
+    excludes
+      Bundles and features that do not have corresponding sources. Example:
+      <excludes>
+       <plugin id='plugin.nosource'/>
+       <feature id='feature.nosource'/>
+      </excludes>
+
+    finalName
+      User property: project.build.finalName
+      The filename to be used for the generated archive file. For the
+      source-feature goal, '-sources-feature' is appended to this filename.
+
+    includeBinaryFeature (Default: true)
+      Whether to add an include dependency from the source feature to the
+      corresponding binary feature. If true, this ensures the version of the
+      installed sources matches the binaries.
+
+    labelSuffix (Default: Developer Resources)
+      Source feature label suffix. Unless explicitly provided in
+      sourceTemplateFeature/feature.properties, this suffix will be appended to
+      the original feature label to construct the source feature label.
+
+    plugins
+      Additional plugins to include in the generated source feature. Beware
+      that these additional plugins are not considered during build target
+      platform calculation and ordering of reactor projects. Use
+      <extraRequirements> dependency resolver configuration to guarantee proper
+      reactor build order.
+      WARNING This experimental parameter may be removed from future
+      source-feature mojo versions without prior notice.
+
+    reuseBrandingPlugin (Default: true)
+      Whether to reuse an explicit branding plugin from the binary feature for
+      the generated source feature.
+
+    skip (Default: false)
+      Whether to skip source feature generation.
+
+    useDefaultExcludes (Default: true)
+      (no description available)

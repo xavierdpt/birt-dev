@@ -1,0 +1,230 @@
+Name: Tycho p2 Metadata Plugin
+Description: Tycho integrates Maven with Eclipse and OSGi
+Group Id: org.eclipse.tycho
+Artifact Id: tycho-p2-plugin
+Version: 2.3.0
+Goal Prefix: tycho-p2
+
+This plugin has 6 goals:
+
+tycho-p2:category-p2-metadata
+  Description: Adds category IUs to existing metadata repository.
+    https://help.eclipse.org/galileo/index.jsp?topic
+    =/org.eclipse.platform.doc.isv/guide/p2_publisher.html
+  Implementation: org.eclipse.tycho.plugins.p2.CategoryP2MetadataMojo
+  Language: java
+
+  Available parameters:
+
+    argLine
+      Arbitrary JVM options to set on the command line.
+
+    artifactRepositoryName (Default: ${project.name} Artifacts)
+      Required: true
+      Artifact repository name
+
+    categoryDefinition (Default: ${project.basedir}/category.xml)
+      (no description available)
+
+    compressRepository (Default: true)
+      (no description available)
+
+    forkedProcessTimeoutInSeconds
+      User property: p2.timeout
+      Kill the forked test process after a certain number of seconds. If set to
+      0, wait forever for the process, never timing out.
+
+    generateP2Metadata (Default: true)
+      (no description available)
+
+    metadataRepositoryName (Default: ${project.name})
+      Required: true
+      Metadata repository name
+
+    target (Default: ${project.build.directory}/site)
+      Generated update site location (must match update-site mojo
+      configuration)
+
+tycho-p2:feature-p2-metadata
+  Description: (no description available)
+  Implementation: org.eclipse.tycho.plugins.p2.FeatureP2MetadataMojo
+  Language: java
+
+  Available parameters:
+
+    argLine
+      Arbitrary JVM options to set on the command line.
+
+    artifactRepositoryName (Default: ${project.name} Artifacts)
+      Required: true
+      Artifact repository name
+
+    compressRepository (Default: true)
+      (no description available)
+
+    forkedProcessTimeoutInSeconds
+      User property: p2.timeout
+      Kill the forked test process after a certain number of seconds. If set to
+      0, wait forever for the process, never timing out.
+
+    generateP2Metadata (Default: true)
+      (no description available)
+
+    metadataRepositoryName (Default: ${project.name})
+      Required: true
+      Metadata repository name
+
+    target (Default: ${project.build.directory}/site)
+      Generated update site location (must match update-site mojo
+      configuration)
+
+tycho-p2:p2-metadata
+  Description: (no description available)
+  Implementation: org.eclipse.tycho.plugins.p2.P2MetadataMojo
+  Language: java
+
+  Available parameters:
+
+    attachP2Metadata (Default: true)
+      (no description available)
+
+    baselineMode (Default: warn)
+      User property: tycho.baseline
+      What happens when build artifact does not match baseline version:
+      - disable: Disable baseline validation.
+      - warn (default): Warn about discrepancies between build and baseline
+        artifacts but do not fail the build.
+      - failCommon: Fail the build if there are discrepancies between artifacts
+        present both in build and baseline. Attached artifacts only present in
+        the build do not result in build failure.
+      - fail: Fail the build if there are any discrepancy between build and
+        baseline artifacts.
+
+    baselineReplace (Default: all)
+      User property: tycho.baseline.replace
+      Whether to replace build artifacts with baseline version or use reactor
+      version:
+      - none: Do not replace build artifacts with baseline version.
+      - common: Replace build artifacts with baseline version. Attached
+        artifacts only present in the build are not removed and will likely
+        result in inconsistencies among artifacts of the same project! Use as
+        last resort when baseline does not contain all build artifacts.
+      - all (default): Replace build artifacts with baseline version. Attached
+        artifacts only present in the build are removed.
+
+    baselineRepositories
+      Baseline build repository(ies). P2 assumes that the same artifact type,
+      id and version represent the same artifact. If baselineRepositories
+      parameter is specified, this assumption is validated and optionally
+      enforced.
+
+    generateDownloadStatsProperty (Default: false)
+      User property: tycho.generateDownloadStatsProperty
+      Whether to generate a 'download.stats' property for artifact metadata.
+      See https://wiki.eclipse.org/Equinox_p2_download_stats
+
+    project
+      User property: project
+      (no description available)
+
+    supportedProjectTypes
+      Project types which this plugin supports.
+
+tycho-p2:p2-metadata-default
+  Description: P2 metadata generation goal bound to default artifact build
+    lifecycle. For explicit binding use p2-metadata goal. The idea is to avoid
+    double p2 metadata generation for projects that generate additional
+    artifacts or post process standard artifacts using custom goals bound to
+    package phase.
+  Implementation: org.eclipse.tycho.plugins.p2.P2MetadataDefaultMojo
+  Language: java
+
+  Available parameters:
+
+    attachP2Metadata (Default: true)
+      (no description available)
+
+    baselineMode (Default: warn)
+      User property: tycho.baseline
+      What happens when build artifact does not match baseline version:
+      - disable: Disable baseline validation.
+      - warn (default): Warn about discrepancies between build and baseline
+        artifacts but do not fail the build.
+      - failCommon: Fail the build if there are discrepancies between artifacts
+        present both in build and baseline. Attached artifacts only present in
+        the build do not result in build failure.
+      - fail: Fail the build if there are any discrepancy between build and
+        baseline artifacts.
+
+    baselineReplace (Default: all)
+      User property: tycho.baseline.replace
+      Whether to replace build artifacts with baseline version or use reactor
+      version:
+      - none: Do not replace build artifacts with baseline version.
+      - common: Replace build artifacts with baseline version. Attached
+        artifacts only present in the build are not removed and will likely
+        result in inconsistencies among artifacts of the same project! Use as
+        last resort when baseline does not contain all build artifacts.
+      - all (default): Replace build artifacts with baseline version. Attached
+        artifacts only present in the build are removed.
+
+    baselineRepositories
+      Baseline build repository(ies). P2 assumes that the same artifact type,
+      id and version represent the same artifact. If baselineRepositories
+      parameter is specified, this assumption is validated and optionally
+      enforced.
+
+    defaultP2Metadata (Default: true)
+      (no description available)
+
+    generateDownloadStatsProperty (Default: false)
+      User property: tycho.generateDownloadStatsProperty
+      Whether to generate a 'download.stats' property for artifact metadata.
+      See https://wiki.eclipse.org/Equinox_p2_download_stats
+
+    project
+      User property: project
+      (no description available)
+
+    supportedProjectTypes
+      Project types which this plugin supports.
+
+tycho-p2:update-local-index
+  Description: (no description available)
+  Implementation: org.eclipse.tycho.plugins.p2.UpdateLocalIndexMojo
+  Language: java
+
+  Available parameters:
+
+tycho-p2:update-site-p2-metadata
+  Description: (no description available)
+  Implementation: org.eclipse.tycho.plugins.p2.UpdateSiteP2MetadataMojo
+  Language: java
+
+  Available parameters:
+
+    argLine
+      Arbitrary JVM options to set on the command line.
+
+    artifactRepositoryName (Default: ${project.name} Artifacts)
+      Required: true
+      Artifact repository name
+
+    compressRepository (Default: true)
+      (no description available)
+
+    forkedProcessTimeoutInSeconds
+      User property: p2.timeout
+      Kill the forked test process after a certain number of seconds. If set to
+      0, wait forever for the process, never timing out.
+
+    generateP2Metadata (Default: true)
+      (no description available)
+
+    metadataRepositoryName (Default: ${project.name})
+      Required: true
+      Metadata repository name
+
+    target (Default: ${project.build.directory}/site)
+      Generated update site location (must match update-site mojo
+      configuration)

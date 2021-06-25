@@ -1,0 +1,204 @@
+Name: Tycho p2 Director Plugin
+Description: Tycho integrates Maven with Eclipse and OSGi
+Group Id: org.eclipse.tycho
+Artifact Id: tycho-p2-director-plugin
+Version: 2.3.0
+Goal Prefix: tycho-p2-director
+
+This plugin has 2 goals:
+
+tycho-p2-director:archive-products
+  Description: Creates archives with the product installations.
+  Implementation: org.eclipse.tycho.plugins.p2.director.ProductArchiverMojo
+  Language: java
+  Bound to phase: package
+
+  Available parameters:
+
+    forkedProcessTimeoutInSeconds (Default: 0)
+      User property: p2.timeout
+      Kill the forked process after a certain number of seconds. If set to 0,
+      wait forever for the process, never timing out.
+
+    formats
+      Maps os to format. By default a zip file will be created. For example,
+      the following configuration will create tar.gz product archives for Linux
+      
+      <formats>
+       <linux>tar.gz</linux>
+      </formats>
+      Supported formats
+      - zip
+      - tar.gz
+
+    products
+      Selection of products to be installed and configuration per product.
+      
+      If the project contains more than one product file, you need to choose
+      for which ones you want to create distribution archives. If you choose to
+      install more than one product, you need to specify the attachId (which
+      becomes a part of the classifier) to make the classifiers unique.
+      Example:
+      
+      <plugin>
+       <groupId>org.eclipse.tycho</groupId>
+       <artifactId>tycho-p2-director-plugin</artifactId>
+       <version>${tycho-version}</version>
+       <executions>
+       <execution>
+       <id>create-distributions</id>
+       <goals>
+       <goal>materialize-products</goal>
+       <goal>archive-products</goal>
+       </goals>
+       </execution>
+       </executions>
+       <configuration>
+       <products>
+       <product>
+       <!-- select product with ID product.id; the archives get the classifiers
+      '<os>.<ws>.<arch>' -->
+       <id>product.id</id>
+       </product>
+       <product>
+       <!-- select product with ID other.product.id for the classifiers
+      'other-<os>.<ws>.<arch>' -->
+       <id>other.product.id</id>
+       <attachId>other</attachId>
+       </product>
+       </products>
+       </configuration>
+      </plugin>
+      The following snippet shows the optional parameters which can be
+      specified per product:
+       <configuration>
+       <products>
+       <product>
+       <id>product.id</id>
+       <!-- optional parameters -->
+       <rootFolder></rootFolder>
+       <rootFolders>
+       <macosx></macosx>
+       <linux></linux>
+       <freebsd></freebsd>
+       <win32></win32>
+       </rootFolders>
+       </product>
+       ...
+       </products>
+       </configuration>
+      Details on the product-specific configuration parameters:
+      - rootFolder - The path where the installed product shall be stored in
+        the archive, e.g. 'eclipse'. By default, the product is stored in the
+        archive root.
+      - rootFolders - OS-specific installation root folders, overriding
+        rootFolder. Allowed children are <macosx>, <win32>, <linux> and
+        <freebsd> or any other OS supported by p2. Since 0.18.0
+
+tycho-p2-director:materialize-products
+  Description: Creates product installations for the products defined in the
+    project.
+  Implementation: org.eclipse.tycho.plugins.p2.director.DirectorMojo
+  Language: java
+  Bound to phase: package
+
+  Available parameters:
+
+    directorRuntime (Default: internal)
+      Runtime in which the director application is executed. Can be
+      
+      - internal - to use the director application from Tycho's embedded OSGi
+        runtime (default)
+      - standalone - to create and use a stand-alone installation of the
+        director application. This option is needed if the product to be
+        installed includes artifacts with meta-requirements (e.g. to a
+        non-standard touchpoint action). Requires that the source parameter is
+        set to repository.
+
+    forkedProcessTimeoutInSeconds (Default: 0)
+      User property: p2.timeout
+      Kill the forked process after a certain number of seconds. If set to 0,
+      wait forever for the process, never timing out.
+
+    installFeatures (Default: true)
+      Include the feature JARs in installation. (Technically, this sets the
+      property org.eclipse.update.install.features to true in the p2 profile.)
+
+    products
+      Selection of products to be installed and configuration per product.
+      
+      If the project contains more than one product file, you need to choose
+      for which ones you want to create distribution archives. If you choose to
+      install more than one product, you need to specify the attachId (which
+      becomes a part of the classifier) to make the classifiers unique.
+      Example:
+      
+      <plugin>
+       <groupId>org.eclipse.tycho</groupId>
+       <artifactId>tycho-p2-director-plugin</artifactId>
+       <version>${tycho-version}</version>
+       <executions>
+       <execution>
+       <id>create-distributions</id>
+       <goals>
+       <goal>materialize-products</goal>
+       <goal>archive-products</goal>
+       </goals>
+       </execution>
+       </executions>
+       <configuration>
+       <products>
+       <product>
+       <!-- select product with ID product.id; the archives get the classifiers
+      '<os>.<ws>.<arch>' -->
+       <id>product.id</id>
+       </product>
+       <product>
+       <!-- select product with ID other.product.id for the classifiers
+      'other-<os>.<ws>.<arch>' -->
+       <id>other.product.id</id>
+       <attachId>other</attachId>
+       </product>
+       </products>
+       </configuration>
+      </plugin>
+      The following snippet shows the optional parameters which can be
+      specified per product:
+       <configuration>
+       <products>
+       <product>
+       <id>product.id</id>
+       <!-- optional parameters -->
+       <rootFolder></rootFolder>
+       <rootFolders>
+       <macosx></macosx>
+       <linux></linux>
+       <freebsd></freebsd>
+       <win32></win32>
+       </rootFolders>
+       </product>
+       ...
+       </products>
+       </configuration>
+      Details on the product-specific configuration parameters:
+      - rootFolder - The path where the installed product shall be stored in
+        the archive, e.g. 'eclipse'. By default, the product is stored in the
+        archive root.
+      - rootFolders - OS-specific installation root folders, overriding
+        rootFolder. Allowed children are <macosx>, <win32>, <linux> and
+        <freebsd> or any other OS supported by p2. Since 0.18.0
+
+    profile (Default: DefaultProfile)
+      The name of the p2 profile to be created.
+
+    profileNames
+      (no description available)
+
+    source (Default: targetPlatform)
+      Source repositories to be used in the director calls. Can be
+      
+      - targetPlatform - to use the target platform as source (default)
+      - repository - to use the p2 repository in target/repository/ as source.
+        With this option, the build implicitly verifies that it would also be
+        possible to install the product from that repository with an external
+        director application.

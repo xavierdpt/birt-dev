@@ -1,0 +1,144 @@
+Name: eclipse-jarsigner-plugin
+Description: Eclipse CBI Maven plugins are created to enable the Eclipse
+  community to use various services at Eclipse including the signing
+  infrastructure.
+Group Id: org.eclipse.cbi.maven.plugins
+Artifact Id: eclipse-jarsigner-plugin
+Version: 1.1.3
+Goal Prefix: eclipse-jarsigner
+
+This plugin has 1 goal:
+
+eclipse-jarsigner:sign
+  Description: Signs project main and attached artifacts using the Eclipse
+    jarsigner webservice. Only artifacts with .jar extension are signed, other
+    artifacts are not signed but a warning message is logged.
+  Implementation: org.eclipse.cbi.maven.plugins.jarsigner.mojo.SignMojo
+  Language: java
+  Bound to phase: package
+
+  Available parameters:
+
+    continueOnFail (Default: false)
+      User property: cbi.jarsigner.continueOnFail
+      Whether the build should be stopped if the signing process fails.
+
+    deprecatedContinueOnFail (Default: false)
+      User property: continueOnFail
+      Whether the build should be stopped if the signing process fails.
+      Deprecated. The user property {@code continueOnFail} is deprecated. You
+       should use the qualified property
+       {@code cbi.jarsigner.continueOnFail} instead. The
+       {@code deprecatedContinueOnFail} parameter has been
+       introduced to support this deprecated user property for
+       backward compatibility only.
+
+    deprecatedRetryLimit (Default: 3)
+      User property: retryLimit
+      Number of times to retry signing if the server fails to sign.
+      Deprecated. The user property {@code retryLimit} is deprecated. You
+       should use the qualified property
+       {@code cbi.jarsigner.retryLimit} instead. The
+       {@code deprecatedRetryLimit} parameter has been introduced to
+       support this deprecated user property for backward
+       compatibility only.
+
+    deprecatedRetryTimer (Default: 10)
+      User property: retryTimer
+      Number of seconds to wait before retrying to sign.
+      Deprecated. The user property {@code retryTimer} is deprecated. You
+       should use the qualified property
+       {@code cbi.jarsigner.retryTimer} instead. The
+       {@code deprecatedRetryTimer} parameter has been introduced to
+       support this deprecated user property for backward
+       compatibility only.
+
+    digestAlgorithm (Default: DEFAULT)
+      User property: cbi.jarsigner.digestAlgorithm
+      The digest algorithm to use for signing the jar file. Supported values
+      depends on the remote signing web services. Values recognized by this
+      plugin are:
+      - DEFAULT, tells to the remote signing webservice to use its default
+        digest algorithm to sign the jar
+      - MD2
+      - MD5
+      - SHA_1
+      - SHA1 Use this value if you need to be compatible with some old
+        frameworks (e.g., Eclipse Equinox 3.7 / Indigo). Use SHA_1 otherwise.
+      - SHA_224
+      - SHA_256
+      - SHA_384
+      - SHA_512
+
+    excludeInnerJars (Default: false)
+      Whether to excludes signing inner jars (not recursive, only apply to
+      first level Jars inside the build Jar file; deeper jars are ignored in
+      all cases).
+
+    resigningStrategy (Default: RESIGN)
+      User property: cbi.jarsigner.resigningStrategy
+      The strategy to be used if the artifacts of the current project are
+      already signed (e.g., when replaced with a baseline version). Valid
+      values are:
+      - DO_NOT_RESIGN, do nothing with the jar file
+      - THROW_EXCEPTION, throws an exception and stop the build if
+        continueOnFail property is not set
+      - RESIGN, resigns the jar with the same parameter as if it was not
+        already signed (in particular the configured digestAlgorithm)
+      - RESIGN_WITH_SAME_DIGEST_ALGORITHM, resigns the jar with the same digest
+        algorithm as the one used when it has been previously signed. Thus, the
+        digestAlgorithm is ignored for the already signed jars.
+      - OVERWRITE, removes every signatures from the jar and resigned it with
+        the same parameter as if it was not already signed (in particular the
+        configured digestAlgorithm)
+      - OVERWRITE_WITH_SAME_DIGEST_ALGORITHM, removes every signatures from the
+        jar and resign it with the same digest algorithm as the one used when
+        it has been previously signed. Thus, the digestAlgorithm is ignored for
+        the already signed jars.
+
+    retryLimit (Default: 3)
+      User property: cbi.jarsigner.retryLimit
+      Number of times to retry signing if the server fails to sign.
+
+    retryTimer (Default: 10)
+      User property: cbi.jarsigner.retryTimer
+      Number of seconds to wait before retrying to sign.
+
+    signatureAlgorithm (Default: DEFAULT)
+      User property: cbi.jarsigner.signatureAlgorithm
+      The signature algorithm to use for signing the jar file. Supported values
+      depends on the remote signing web services. Values recognized by this
+      plugin are:
+      - DEFAULT, tells to the remote signing webservice to use its default
+        digest algorithm to sign the jar
+      - NONEwithRSA
+      - MD2withRSA
+      - MD5withRSA
+      - SHA1withRSA
+      - SHA224withRSA
+      - SHA256withRSA
+      - SHA384withRSA
+      - SHA512withRSA
+      - SHA1withDSA
+      - SHA224withDSA
+      - SHA256withDSA
+      - NONEwithECDSA
+      - SHA1withECDSA
+      - SHA224withECDSA
+      - SHA256withECDSA
+      - SHA384withECDSA
+      - SHA512withECDSA
+
+    signerUrl (Default: http://build.eclipse.org:31338/sign)
+      Required: true
+      User property: cbi.jarsigner.signerUrl
+      The signing service URL for signing Jar files. This service should return
+      a signed jar file.
+
+    skip (Default: false)
+      User property: cbi.jarsigner.skip
+      Whether the execution of this plugin should be skipped.
+
+    supportedProjectTypes
+      Project types which this plugin supports.
+      Deprecated. Not used anymore.
